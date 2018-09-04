@@ -1,0 +1,9 @@
+data/*
+dataworker_files/*
+testing_data/*
+.DS_store
+__pycache__/
+*.py[cod]
+*.swp
+cache
+
