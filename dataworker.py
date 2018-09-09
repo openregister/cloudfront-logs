@@ -15,13 +15,14 @@ headers = ['date', 'time', 'x-edge-location', 'sc-bytes', 'c-ip', 'cs-method', '
 main_data = pd.read_csv('headers.tsv',delimiter='\t',encoding='utf-8')
 
 #read file and remove first 2 rows
-def read_from_gz(filename, foldername):
+def read_from_gz(filename, foldername,folder_no_data):
 	l = []
 	with gzip.open(foldername + '/' + filename) as f:
 		data_to_append = pd.read_csv(foldername + '/' +filename,names=headers,delimiter='\t',skiprows=2,encoding='utf-8',compression='gzip')
-		#data_to_append= data_to_append.replace('-','')
-		#data_to_append=data_to_append.fillna('')
-		return pd.concat([main_data,data_to_append])
+		data_to_append= data_to_append.replace('-','')
+		data_to_append=data_to_append.fillna('')
+		data_to_append.to_csv('dataworker_files/'+folder_no_data+'.csv',mode='a',header=False,encoding='utf-8') 
+		#return pd.concat([main_data,data_to_append])
 
 
 counter = 0
@@ -29,18 +30,16 @@ count = 0
 for folder in folder_list:
 	file_list = os.listdir('data/'+folder)
 	if '.DS_Store' in file_list: file_list.remove('.DS_Store')
+	main_data.to_csv('dataworker_files/'+folder+'.csv',encoding='utf-8')
 	for file in file_list:
-		main_data=read_from_gz(file,'data/'+folder)
-		main_data = main_data.replace('-','')
-		main_data = main_data.fillna('')
+		read_from_gz(file,'data/'+folder,folder)
+		#main_data = main_data.replace('-','')
+		#main_data = main_data.fillna('')
 		counter +=1
 		if counter >100:
 			count +=1
 			print(str(count) + '00 files have been added and I am currently importing '+ folder)
 			counter = counter-100
-	main_data.to_csv('dataworker_files/'+folder+'.csv',encoding='utf-8')
-	main_data=pd.read_csv('headers.tsv',delimiter='\t',encoding='utf-8')
-
 
 
 
